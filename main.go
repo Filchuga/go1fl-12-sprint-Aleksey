@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	ParcelStatusRegistered = "registered" //проверка jobs
+	ParcelStatusRegistered = "registered"
 	ParcelStatusSent       = "sent"
 	ParcelStatusDelivered  = "delivered"
 )
