@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     tags: [ 'v*' ]
-  pull_request:
+  pull_requests:
     branches: [ main ]
 
 jobs:
@@ -33,10 +33,16 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     needs: test-and-lint
-    if: contains(github.ref, 'refs/tags/')
+    if: github.ref_type == 'tag'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set repository name in lowercase
+        id: set-repo-name
+        run: |
+          LOWER_NAME=$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')
+          echo "REPO_NAME_LOWER=$LOWER_NAME" >> $GITHUB_OUTPUT
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -50,4 +56,4 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:${{ github.ref_name }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.set-repo-name.outputs.REPO_NAME_LOWER }}:${{ github.ref_name }}
